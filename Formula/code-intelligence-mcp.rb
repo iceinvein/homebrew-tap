@@ -8,7 +8,8 @@
 # The formula is intentionally minimal:
 #   * Downloads the prebuilt arm64 binary tarball from the GitHub release
 #     that matches `version`.
-#   * Installs the single binary into the Homebrew prefix.
+#   * Installs the server binary, bundled external producer helpers, and
+#     producer manifest into the Homebrew prefix.
 #   * Declares a service so users can `brew services start
 #     code-intelligence-mcp` and let launchd manage the daemon.
 #
@@ -20,7 +21,7 @@
 class CodeIntelligenceMcp < Formula
   desc "Local code intelligence MCP server with semantic search, graph navigation, on-device LLM"
   homepage "https://github.com/iceinvein/code_intelligence_mcp_server"
-  version "4.4.1"
+  version "4.5.0"
   license "MIT"
 
   on_macos do
@@ -28,7 +29,7 @@ class CodeIntelligenceMcp < Formula
       url "https://github.com/iceinvein/code_intelligence_mcp_server/releases/download/v#{version}/code-intelligence-mcp-server-aarch64-apple-darwin.tar.gz"
       # The `sha256` is rewritten by `scripts/release.sh` (or the release
       # workflow's bump step) after the tarball is built and uploaded.
-      sha256 "c9dbfee42a544127533c1fbfdd0eeaafe93ad9e0af1b8ba19b09c4355cbfabd2"
+      sha256 "a7e2d16df854d0a63484027f8bd7cf88b65fa4dd2761de80430dc66a32fae60e"
     end
 
     on_intel do
@@ -42,6 +43,8 @@ class CodeIntelligenceMcp < Formula
 
   def install
     bin.install "code-intelligence-mcp-server"
+    bin.install Dir["code-intelligence-external-*"]
+    (bin/"producers").install "producers/manifest.json"
   end
 
   service do
@@ -59,6 +62,8 @@ class CodeIntelligenceMcp < Formula
     # already-running service on the same port and download multi-GB
     # model weights.
     assert_match "code-intelligence-mcp-server", shell_output("#{bin}/code-intelligence-mcp-server --help 2>&1", 0)
+    assert_path_exists bin/"producers/manifest.json"
+    assert_path_exists bin/"code-intelligence-external-rust"
   end
 
   def caveats
