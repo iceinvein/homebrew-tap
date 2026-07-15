@@ -21,7 +21,7 @@
 class CodeIntelligenceMcp < Formula
   desc "Local code intelligence MCP server with semantic search, graph navigation, on-device LLM"
   homepage "https://github.com/iceinvein/code_intelligence_mcp_server"
-  version "4.6.0"
+  version "4.7.0"
   license "MIT"
 
   on_macos do
@@ -29,7 +29,7 @@ class CodeIntelligenceMcp < Formula
       url "https://github.com/iceinvein/code_intelligence_mcp_server/releases/download/v#{version}/code-intelligence-mcp-server-aarch64-apple-darwin.tar.gz"
       # The `sha256` is rewritten by `scripts/release.sh` (or the release
       # workflow's bump step) after the tarball is built and uploaded.
-      sha256 "4625852b328a59f99553215b1f51d28d173d2ecb62214ef7cd166d8964fa2466"
+      sha256 "00ff31b695196bdae3b5f6070558e1d4c7f9eb2e0d33000cd8538975b68f9602"
     end
 
     on_intel do
