@@ -19,9 +19,9 @@
 # who installed via npm or downloaded the binary directly.
 
 class CodeIntelligenceMcp < Formula
-  desc "Local code intelligence MCP server with semantic search, graph navigation, on-device LLM"
+  desc "Local code intelligence CLI with semantic search and optional MCP support"
   homepage "https://github.com/iceinvein/code_intelligence_mcp_server"
-  version "4.10.0"
+  version "4.11.0"
   license "MIT"
 
   on_macos do
@@ -29,7 +29,7 @@ class CodeIntelligenceMcp < Formula
       url "https://github.com/iceinvein/code_intelligence_mcp_server/releases/download/v#{version}/code-intelligence-mcp-server-aarch64-apple-darwin.tar.gz"
       # The `sha256` is rewritten by `scripts/release.sh` (or the release
       # workflow's bump step) after the tarball is built and uploaded.
-      sha256 "4d70c44b389ac41b826938f34efd87f86d393ebeba35adc301113c0dd4c76d72"
+      sha256 "a937bc33160c64b2f6bf7ea2ec101fda9d286645e4c5a72019f2cfc71393e053"
     end
 
     on_intel do
@@ -43,6 +43,7 @@ class CodeIntelligenceMcp < Formula
 
   def install
     bin.install "code-intelligence-mcp-server"
+    bin.install_symlink bin/"code-intelligence-mcp-server" => "code-intel"
     bin.install Dir["code-intelligence-external-*"]
     (bin/"producers").install "producers/manifest.json"
   end
@@ -61,7 +62,8 @@ class CodeIntelligenceMcp < Formula
     # exercise the daemon in `brew test` because it would race with any
     # already-running service on the same port and download multi-GB
     # model weights.
-    assert_match "code-intelligence-mcp-server", shell_output("#{bin}/code-intelligence-mcp-server --help 2>&1", 0)
+    assert_match "code-intel", shell_output("#{bin}/code-intelligence-mcp-server --help 2>&1", 0)
+    assert_match "code-intel", shell_output("#{bin}/code-intel --help 2>&1", 0)
     assert_path_exists bin/"producers/manifest.json"
     assert_path_exists bin/"code-intelligence-external-rust"
   end
@@ -75,7 +77,11 @@ class CodeIntelligenceMcp < Formula
       To start the daemon:
         brew services start code-intelligence-mcp
 
-      Bind a workspace by configuring your MCP client URL as
+      Query code from any terminal or coding agent:
+        code-intel ask --repo /abs/path/to/repo "How does authentication work?"
+        code-intel capabilities --json
+
+      MCP is optional. Bind a workspace by configuring your MCP client URL as
         http://127.0.0.1:17800/mcp?repo=/abs/path/to/your/repo
 
       Or use `code-intelligence-mcp-server migrate` to rewrite an existing
